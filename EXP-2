@@ -1,0 +1,50 @@
+import random
+
+# Number of movies
+K = 5
+
+# Number of user interactions
+N = 1000
+
+# Exploration probability
+epsilon = 0.1
+
+# Estimated rewards
+reward_estimates = [0.0] * K
+
+# Number of times each movie is selected
+counts = [0] * K
+
+# True reward probabilities of movies
+true_rewards = [0.3, 0.5, 0.7, 0.4, 0.6]
+
+for i in range(N):
+
+    # Exploration or exploitation
+    if random.random() < epsilon:
+        # Exploration: choose random movie
+        movie = random.randint(0, K - 1)
+    else:
+        # Exploitation: choose movie with highest estimated reward
+        movie = reward_estimates.index(max(reward_estimates))
+
+    # Simulate user engagement
+    reward = 1 if random.random() < true_rewards[movie] else 0
+
+    # Update count
+    counts[movie] += 1
+
+    # Update reward estimate
+    reward_estimates[movie] += (
+        reward - reward_estimates[movie]
+    ) / counts[movie]
+
+# Find best movie
+best_movie = reward_estimates.index(max(reward_estimates))
+
+print("Reward Estimates:")
+for i in range(K):
+    print("Movie", i + 1, ":", reward_estimates[i])
+
+print("\nBest Movie:", best_movie + 1)
+print("Highest Expected Reward:", reward_estimates[best_movie])
