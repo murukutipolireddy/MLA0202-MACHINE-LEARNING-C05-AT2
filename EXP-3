@@ -1,0 +1,133 @@
+# Value Iteration for Robot Path Planning
+
+rows = 4
+cols = 4
+
+states = [(r, c) for r in range(rows) for c in range(cols)]
+
+# Goal and obstacles
+goal = (3, 3)
+obstacles = [(1, 1), (2, 1)]
+
+# Actions
+actions = {
+    "UP": (-1, 0),
+    "DOWN": (1, 0),
+    "LEFT": (0, -1),
+    "RIGHT": (0, 1)
+}
+
+# Discount factor
+gamma = 0.9
+
+# Initialize value function
+V = {state: 0 for state in states}
+
+# Value iteration
+for iteration in range(100):
+
+    new_V = V.copy()
+
+    for state in states:
+
+        # Skip obstacles and goal
+        if state in obstacles or state == goal:
+            continue
+
+        values = []
+
+        for action, move in actions.items():
+
+            new_row = state[0] + move[0]
+            new_col = state[1] + move[1]
+
+            # Check boundaries
+            if (new_row < 0 or new_row >= rows or
+                    new_col < 0 or new_col >= cols):
+
+                next_state = state
+            elif (new_row, new_col) in obstacles:
+
+                next_state = state
+            else:
+                next_state = (new_row, new_col)
+
+            # Reward
+            if next_state == goal:
+                reward = 10
+            else:
+                reward = -1
+
+            value = reward + gamma * V[next_state]
+
+            values.append(value)
+
+        new_V[state] = max(values)
+
+    # Check convergence
+    difference = max(
+        abs(new_V[s] - V[s]) for s in states
+    )
+
+    V = new_V
+
+    if difference < 0.001:
+        break
+
+# Generate optimal policy
+policy = {}
+
+for state in states:
+
+    if state in obstacles:
+        policy[state] = "#"
+        continue
+
+    if state == goal:
+        policy[state] = "G"
+        continue
+
+    best_value = float("-inf")
+    best_action = None
+
+    for action, move in actions.items():
+
+        new_row = state[0] + move[0]
+        new_col = state[1] + move[1]
+
+        if (new_row < 0 or new_row >= rows or
+                new_col < 0 or new_col >= cols):
+
+            next_state = state
+        elif (new_row, new_col) in obstacles:
+
+            next_state = state
+        else:
+            next_state = (new_row, new_col)
+
+        if next_state == goal:
+            reward = 10
+        else:
+            reward = -1
+
+        value = reward + gamma * V[next_state]
+
+        if value > best_value:
+            best_value = value
+            best_action = action
+
+    policy[state] = best_action
+
+print("Optimal Value Function:")
+for r in range(rows):
+    print([
+        round(V[(r, c)], 2)
+        for c in range(cols)
+    ])
+
+print("\nOptimal Policy:")
+for r in range(rows):
+    print([
+        policy[(r, c)]
+        for c in range(cols)
+    ])
