@@ -1,0 +1,30 @@
+import random
+
+N = 10000
+
+# Count of on-time deliveries
+on_time_count = 0
+
+for i in range(N):
+
+    # Generate random traffic condition
+    traffic = random.choice(["Low", "Medium", "High"])
+
+    # Simulate delivery
+    if traffic == "Low":
+        on_time = random.random() < 0.90
+    elif traffic == "Medium":
+        on_time = random.random() < 0.70
+    else:
+        on_time = random.random() < 0.40
+
+    # Count on-time deliveries
+    if on_time:
+        on_time_count += 1
+
+# Estimate probability
+probability = on_time_count / N
+
+print("Total Simulations:", N)
+print("On-Time Deliveries:", on_time_count)
+print("Estimated Probability of On-Time Delivery:", probability)
